@@ -120,6 +120,9 @@ module RuboCop
           example_group = RuboCop::RSpec::ExampleGroup.new(node)
           example_group.lets.any? do |let_node|
             upper_let_name = extract_let_name(let_node)
+
+            next unless upper_let_name
+
             upper_let_name == let_name
           end || overrided?(node.parent, let_name)
         end
