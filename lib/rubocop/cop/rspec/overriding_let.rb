@@ -105,8 +105,7 @@ module RuboCop
           return if example_group.lets.empty?
 
           example_group.lets.each do |let_node|
-            let_name = let_node.send_node.first_argument.value
-
+            let_name = extract_let_name(let_node)
             next unless overrided?(node.parent, let_name)
 
             add_offense(let_node)
@@ -120,9 +119,26 @@ module RuboCop
 
           example_group = RuboCop::RSpec::ExampleGroup.new(node)
           example_group.lets.any? do |let_node|
-            upper_let_name = let_node.send_node.first_argument.value
+            upper_let_name = extract_let_name(let_node)
             upper_let_name == let_name
           end || overrided?(node.parent, let_name)
+        end
+
+        def extract_let_name(node) # rubocop:disable Metrics/MethodLength
+          case node.type
+          when :send
+            extract_let_name(node.first_argument)
+          when :block
+            extract_let_name(node.send_node)
+          when :begin
+            extract_let_name(node.children.first)
+          when :lvar
+            # When the node is a local variable (`lvar`), it returns false
+            # because the content of the variable is unknown when linting.
+            false
+          else
+            node.value
+          end
         end
       end
     end
