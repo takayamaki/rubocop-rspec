@@ -80,6 +80,18 @@ RSpec.describe RuboCop::Cop::RSpec::OverridingLet do
     RUBY
   end
 
+  it 'does not register an offense when let name is via method invoke' do
+    expect_no_offenses(<<~RUBY)
+      RSpec.describe do
+        let(let_name_via_method_invoke) { 1 }
+
+        context do
+          let!(let_name_via_method_invoke) { 2 }
+        end
+      end
+    RUBY
+  end
+
   it 'does not register an offense when let name is via local variable' do
     expect_no_offenses(<<~RUBY)
       RSpec.describe do

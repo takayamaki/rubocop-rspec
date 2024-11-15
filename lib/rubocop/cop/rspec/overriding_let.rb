@@ -130,6 +130,8 @@ module RuboCop
         def extract_let_name(node) # rubocop:disable Metrics/MethodLength
           case node.type
           when :send
+            return false unless node.method?(:let) || node.method?(:let!)
+
             extract_let_name(node.first_argument)
           when :block
             extract_let_name(node.send_node)
