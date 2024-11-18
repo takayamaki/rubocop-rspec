@@ -127,7 +127,7 @@ module RuboCop
           end || overrided?(node.parent, let_name)
         end
 
-        def extract_let_name(node) # rubocop:disable Metrics/MethodLength
+        def extract_let_name(node) # rubocop:disable Metrics/MethodLength,Metrics/CyclomaticComplexity
           case node.type
           when :send
             return false unless node.method?(:let) || node.method?(:let!)
@@ -137,9 +137,10 @@ module RuboCop
             extract_let_name(node.send_node)
           when :begin
             extract_let_name(node.children.first)
-          when :lvar
-            # When the node is a local variable (`lvar`), it returns false
-            # because the content of the variable is unknown when linting.
+          when :lvar, :dstr
+            # When the node is a local variable (`lvar`) and string with
+            # interpolation (`dstr`), it returns false because the result of
+            # the node is unknown when linting.
             false
           when :sym
             node.value

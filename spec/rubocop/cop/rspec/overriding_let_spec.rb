@@ -130,4 +130,16 @@ RSpec.describe RuboCop::Cop::RSpec::OverridingLet do
       end
     RUBY
   end
+
+  it 'does not register offenses when let! is used with interpolated string' do
+    expect_no_offenses(<<~RUBY)
+      RSpec.describe do
+        let(:foo) { 1 }
+
+        context do
+          let!("foo\#{bar}") { 2 }
+        end
+      end
+    RUBY
+  end
 end
