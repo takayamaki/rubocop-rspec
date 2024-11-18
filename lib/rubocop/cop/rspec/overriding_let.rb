@@ -117,7 +117,8 @@ module RuboCop
         def overrided?(node, let_name)
           return false if node.nil?
 
-          example_group = RuboCop::RSpec::ExampleGroup.new(node)
+          example_group = cached_example_group(node)
+
           example_group.lets.any? do |let_node|
             upper_let_name = extract_let_name(let_node)
 
@@ -125,6 +126,14 @@ module RuboCop
 
             upper_let_name == let_name
           end || overrided?(node.parent, let_name)
+        end
+
+        def cached_example_group(node)
+          @example_group_memos ||= {}
+          example_group_memo_key =
+            "#{node.source_range.begin_pos}-#{node.source_range.end_pos}"
+          @example_group_memos[example_group_memo_key] ||=
+            RuboCop::RSpec::ExampleGroup.new(node)
         end
 
         def extract_let_name(node) # rubocop:disable Metrics/MethodLength,Metrics/CyclomaticComplexity
