@@ -141,8 +141,12 @@ module RuboCop
             # When the node is a local variable (`lvar`), it returns false
             # because the content of the variable is unknown when linting.
             false
-          else
+          when :sym
             node.value
+          when :str
+            node.value.to_sym
+          else
+            raise "Unexpected node type: #{node.type}"
           end
         end
       end

@@ -104,4 +104,30 @@ RSpec.describe RuboCop::Cop::RSpec::OverridingLet do
       end
     RUBY
   end
+
+  it 'registers an offense when let! is overridden with a string' do
+    expect_offense(<<~RUBY)
+      RSpec.describe do
+        let(:foo) { 1 }
+
+        context do
+          let!('foo') { 2 }
+          ^^^^^^^^^^^^^^^^^ Do not override let.
+        end
+      end
+    RUBY
+  end
+
+  it 'registers an offense when let! is overridden with a double-quoted str' do
+    expect_offense(<<~RUBY)
+      RSpec.describe do
+        let(:foo) { 1 }
+
+        context do
+          let!("foo") { 2 }
+          ^^^^^^^^^^^^^^^^^ Do not override let.
+        end
+      end
+    RUBY
+  end
 end
